@@ -94,14 +94,37 @@ fn get_next_command() -> Commands {
     io::stdin()
         .read_line(&mut input)
         .expect("Failed in reading user input");
-    if input.to_lowercase().starts_with("bet") {
-        let new_bet = get_bet(&input);
-        Commands::Bet(new_bet)
-    } else if input.to_lowercase().starts_with("call") {
-        Commands::Call
-    } else {
-        println!("please use one of those commands: bet, call");
-        Commands::Unknown
+    let split = input.trim().trim_end().split(" ").collect::<Vec<&str>>();
+    if split.len() < 1{
+        println!("Invalid command format. Expected: bet <POKER COMBINATION>|call");
+        return Commands::Unknown
+    }
+    match split[0] {
+        "bet" => {
+            if split.len() != 2 {
+                println!("Invalid command format. Expected: bet <POKER COMBINATION>|call");
+                return Commands::Unknown
+            }
+            let new_bet = get_bet(&split[1]);
+            match new_bet {
+                Ok(bet) => {Commands::Bet(bet)}
+                Err(err) => {
+                    println!("{}", err);
+                    Commands::Unknown
+                }
+            }
+        },
+        "call" => {
+            if split.len() != 1 {
+                println!("Invalid command format. Expected: bet <POKER COMBINATION>|call");
+                return Commands::Unknown
+            }
+            Commands::Call
+        },
+        _ => {
+            println!("please use one of those commands: bet, call");
+            Commands::Unknown
+        }
     }
 }
 
@@ -114,19 +137,5 @@ fn handle_new_bet(new_bet: PokerCombination, current_bet: &mut PokerCombination)
 }
 
 fn get_bet(bet_str: &str) -> Result<PokerCombination, String> {
-    // To improve the error handling in this function. The command format error is easily recoverable
-    let split = bet_str.split(" ").collect::<Vec<&str>>();
-    assert_eq!(split.len(), 2, "Incorrect number of arguments to \"bet\" command. Expected: bet <name of proposed combination>");
-    assert_eq!(
-        split[0].to_lowercase(),
-        "bet",
-        "{} {}",
-        "Unknown command. Expected: bet, Actual: ",
-        split[0]
-    );
-    let combination = PokerCombination::try_from(split[1]);
-    // combination.unwrap_or_else(|e| {
-    //     panic!("{}", e)
-    // })
-    combination
+    PokerCombination::try_from(bet_str)
 }
