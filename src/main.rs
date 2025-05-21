@@ -1,10 +1,10 @@
 use std::io;
+
+use commands::Commands;
 use poker_combination::PokerCombination;
 
 use crate::hand::Hand;
 use crate::players::Players;
-
-//use std::io::Write;
 
 mod card_suit;
 mod card_value;
@@ -14,14 +14,27 @@ mod poker_combination;
 mod utils;
 mod commands;
 
-use commands::Commands;
-
+pub struct Config{
+    no_of_players: u8,
+    card_on_hand_limit: u8,
+}
+impl Config{
+    pub fn get_config() -> Self{
+        println!("Please input the configuration for the game");
+        println!("number of players:");
+        let no_of_players:u8 = text_io::try_read!().expect("Did not enter a valid u8");
+        println!("cards on hands limit:");
+        let card_on_hand_limit:u8 = text_io::try_read!().expect("Did not enter a valid u8");
+        Config{no_of_players, card_on_hand_limit}
+    }
+}
 
 fn main() {
     println!("Welcome to bluff!");
-    let mut players = Players::new(3);
+    let config: Config = Config::get_config();
+    let mut players = Players::new(config.no_of_players);
     let mut current_bet = PokerCombination::None;
-    while !players.is_limit_hit(6) {
+    while !players.is_limit_hit(config.card_on_hand_limit) {
         play_round(&mut players, &mut current_bet);
     }
     println!("Game over. A player reached the card limit. Press ENTER to continue");

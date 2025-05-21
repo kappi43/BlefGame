@@ -8,7 +8,7 @@ pub enum Commands {
     Unknown,
 }
 
-pub fn get_next_command() -> crate::Commands {
+pub fn get_next_command() -> Commands {
     let mut input = String::new();
     println!("Please input command");
     io::stdin()
