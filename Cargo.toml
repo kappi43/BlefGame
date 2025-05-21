@@ -1,0 +1,9 @@
+[package]
+name = "Poker"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clearscreen = "4.0.1"
+rand = "0.8.0"
+rand_derive2 = "0.1.21"
