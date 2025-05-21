@@ -72,4 +72,8 @@ impl Players {
         }
         all_cards
     }
+
+    pub fn is_limit_hit(&self, limit: u8) -> bool {
+        self.players().iter().any(|player|player.number_of_cards_to_deal == limit)
+    }
 }

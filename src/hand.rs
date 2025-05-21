@@ -44,6 +44,10 @@ impl Hand {
     pub fn clear_cards(&mut self) {
         self.cards.0.clear();
     }
+
+    pub fn len(&self) -> usize{
+        self.cards.0.len()
+    }
 }
 
 impl Default for Hand {

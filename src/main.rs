@@ -1,7 +1,4 @@
 use std::io;
-
-use clearscreen::ClearScreen;
-
 use poker_combination::PokerCombination;
 
 use crate::hand::Hand;
@@ -14,36 +11,38 @@ mod card_value;
 mod hand;
 mod players;
 mod poker_combination;
+mod utils;
+mod commands;
 
-#[derive(PartialEq)]
-enum Commands {
-    Bet(PokerCombination),
-    Call,
-    Unknown,
-}
+use commands::Commands;
+
 
 fn main() {
     println!("Welcome to bluff!");
     let mut players = Players::new(3);
     let mut current_bet = PokerCombination::None;
-    loop {
+    while !players.is_limit_hit(6) {
         play_round(&mut players, &mut current_bet);
     }
+    println!("Game over. A player reached the card limit. Press ENTER to continue");
+
+    io::stdin()
+        .read_line(&mut String::new())
+        .expect("Failed in reading user input");
 }
+
 
 fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
     println!("Beginning new round");
-    /**************/
- // Dirty hack
-    let mut all_cards = players.get_all_cards();
-    /**************/
+
+    let all_cards = players.get_all_cards();
     for (index, player) in players.players_mut().iter_mut().enumerate() {
         println!("Current bet: {:?}", current_bet);
         println!("Player {index}");
         player.print_hand();
-        let mut command = get_next_command();
+        let mut command = commands::get_next_command();
         while command == Commands::Unknown{
-            command = get_next_command();
+            command = commands::get_next_command();
         }
         match command {
             Commands::Bet(value) => {
@@ -73,59 +72,12 @@ fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
             }
             Commands::Unknown => {}
         }
-        clear_screen();
+        utils::clear_screen();
     }
 }
 
 fn check_round_result(current_bet: &PokerCombination, all_cards: &Hand) -> bool {
     all_cards.is_matching(current_bet) // to change into "contains combination"
-}
-
-fn clear_screen() {
-    let res = ClearScreen::default().clear();
-    if let Err(e) = res {
-        println!("Could not clear screen: {e}");
-    }
-}
-
-fn get_next_command() -> Commands {
-    let mut input = String::new();
-    println!("Please input command");
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Failed in reading user input");
-    let split = input.trim().trim_end().split(" ").collect::<Vec<&str>>();
-    if split.len() < 1{
-        println!("Invalid command format. Expected: bet <POKER COMBINATION>|call");
-        return Commands::Unknown
-    }
-    match split[0] {
-        "bet" => {
-            if split.len() != 2 {
-                println!("Invalid command format. Expected: bet <POKER COMBINATION>|call");
-                return Commands::Unknown
-            }
-            let new_bet = get_bet(&split[1]);
-            match new_bet {
-                Ok(bet) => {Commands::Bet(bet)}
-                Err(err) => {
-                    println!("{}", err);
-                    Commands::Unknown
-                }
-            }
-        },
-        "call" => {
-            if split.len() != 1 {
-                println!("Invalid command format. Expected: bet <POKER COMBINATION>|call");
-                return Commands::Unknown
-            }
-            Commands::Call
-        },
-        _ => {
-            println!("please use one of those commands: bet, call");
-            Commands::Unknown
-        }
-    }
 }
 
 fn handle_new_bet(new_bet: PokerCombination, current_bet: &mut PokerCombination) {
