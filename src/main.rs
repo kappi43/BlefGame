@@ -1,6 +1,7 @@
 use std::io;
 
 use commands::Commands;
+use config::Config;
 use poker_combination::PokerCombination;
 
 use crate::hand::Hand;
@@ -8,28 +9,15 @@ use crate::players::Players;
 
 mod card_suit;
 mod card_value;
+mod commands;
+mod config;
 mod hand;
 mod players;
 mod poker_combination;
 mod utils;
-mod commands;
-
-pub struct Config{
-    no_of_players: u8,
-    card_on_hand_limit: u8,
-}
-impl Config{
-    pub fn get_config() -> Self{
-        println!("Please input the configuration for the game");
-        println!("number of players:");
-        let no_of_players:u8 = text_io::try_read!().expect("Did not enter a valid u8");
-        println!("cards on hands limit:");
-        let card_on_hand_limit:u8 = text_io::try_read!().expect("Did not enter a valid u8");
-        Config{no_of_players, card_on_hand_limit}
-    }
-}
 
 fn main() {
+    // Most of this code should be in GameLogic
     println!("Welcome to bluff!");
     let config: Config = Config::get_config();
     let mut players = Players::new(config.no_of_players);
@@ -44,7 +32,7 @@ fn main() {
         .expect("Failed in reading user input");
 }
 
-
+// To refactor and extract all the below functions to GameLogic module
 fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
     println!("Beginning new round");
 
@@ -53,8 +41,9 @@ fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
         println!("Current bet: {:?}", current_bet);
         println!("Player {index}");
         player.print_hand();
+        // Move the below command getting loop into a method in commands? try_get_next_command_until_success?
         let mut command = commands::get_next_command();
-        while command == Commands::Unknown{
+        while command == Commands::Unknown {
             command = commands::get_next_command();
         }
         match command {
@@ -62,7 +51,8 @@ fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
                 handle_new_bet(value, current_bet);
             }
             Commands::Call => {
-                let result = check_round_result(current_bet, &all_cards);
+                let result = check_round_result(current_bet, &all_cards); // Can return Result<RoundResult> to function above and handle round end there. This would save
+                //MAYBE players could be linked list. This would clean up this bit below A LOT. We don't care that much about performance, we probably will have at most close to 10 elements in the data structure.
                 if result {
                     player.increase_number_of_cards_to_deal();
                 } else if index == 0 {
@@ -90,7 +80,7 @@ fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
 }
 
 fn check_round_result(current_bet: &PokerCombination, all_cards: &Hand) -> bool {
-    all_cards.is_matching(current_bet) // to change into "contains combination"
+    all_cards.discover_combinations().contains(current_bet)
 }
 
 fn handle_new_bet(new_bet: PokerCombination, current_bet: &mut PokerCombination) {

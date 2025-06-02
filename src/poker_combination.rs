@@ -9,11 +9,12 @@ pub enum PokerCombination {
     Quad,
     Straight,
     Flush,
-    Poker,
-    RoyalPoker,
+    StraightFlush,
+    RoyalFlush,
 }
 
 impl TryFrom<&str> for PokerCombination {
+    // change into an actual error type
     type Error = String;
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
@@ -27,8 +28,8 @@ impl TryFrom<&str> for PokerCombination {
             "quad" => Ok(PokerCombination::Quad),
             "straight" => Ok(PokerCombination::Straight),
             "flush" => Ok(PokerCombination::Flush),
-            "poker" => Ok(PokerCombination::Poker),
-            "royalpoker" => Ok(PokerCombination::RoyalPoker),
+            "straightflush" => Ok(PokerCombination::StraightFlush),
+            "royalflush" => Ok(PokerCombination::RoyalFlush),
             _ => Err("Invalid PokerCombination name".to_string()),
         }
     }
