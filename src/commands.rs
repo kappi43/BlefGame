@@ -17,7 +17,7 @@ pub fn get_next_command() -> Commands {
         .expect("Failed in reading user input");
     println!("Command: {input}");
     let split = input.trim().trim_end().split(" ").collect::<Vec<&str>>();
-    if split.len() < 1 {
+    if split.is_empty() {
         println!("Invalid command format. Expected: bet <POKER COMBINATION>|call");
         return Commands::Unknown;
     }
@@ -27,7 +27,7 @@ pub fn get_next_command() -> Commands {
                 println!("Invalid command format. Expected: bet <POKER COMBINATION>|call");
                 return Commands::Unknown;
             }
-            let new_bet = crate::get_bet(&split[1]);
+            let new_bet = crate::get_bet(split[1]);
             match new_bet {
                 Ok(bet) => Commands::Bet(bet),
                 Err(err) => {

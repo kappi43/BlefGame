@@ -1,5 +1,3 @@
-use std::io::Write;
-
 pub struct Config {
     pub(crate) no_of_players: u8,
     pub(crate) card_on_hand_limit: u8,

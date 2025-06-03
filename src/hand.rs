@@ -20,20 +20,9 @@ impl Card {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct Cards(Vec<Card>);
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Hand {
-    cards: Cards,
-}
-
-impl Default for Hand {
-    fn default() -> Self {
-        Hand {
-            cards: Cards(vec![]),
-        }
-    }
+    cards: Vec<Card>,
 }
 
 impl Hand {
@@ -42,22 +31,19 @@ impl Hand {
     }
 
     pub fn put_card(&mut self, card: Card) {
-        self.cards.0.push(card);
+        self.cards.push(card);
     }
 
     pub fn put_cards(&mut self, cards: &Hand) {
-        for card in &cards.cards.0 {
-            self.cards.0.push(*card);
+        for card in &cards.cards {
+            self.cards.push(*card);
         }
     }
 
     pub fn clear_cards(&mut self) {
-        self.cards.0.clear();
+        self.cards.clear();
     }
 
-    pub fn len(&self) -> usize {
-        self.cards.0.len()
-    }
     pub fn discover_combinations(&self) -> Vec<PokerCombination> {
         let mut combinations_found = Vec::new();
         self.find_flush(&mut combinations_found);
@@ -70,7 +56,6 @@ impl Hand {
     fn find_flush(&self, combinations_found: &mut Vec<PokerCombination>) {
         let is_flush = self
             .cards
-            .0
             .iter()
             .map(|x| x.suit)
             .collect::<HashSet<Suit>>()
@@ -97,10 +82,10 @@ impl Hand {
             }
             _ => {}
         }
-        if value_count_map.values().find(|&&x| x >= 3).is_some() {
+        if value_count_map.values().any(|&x| x >= 3) {
             combinations_found.push(PokerCombination::Three);
         }
-        if value_count_map.values().find(|&&x| x >= 4).is_some() {
+        if value_count_map.values().any(|&x| x >= 4) {
             // Four of a kind does not contain two pairs according to the Internet
             combinations_found.push(PokerCombination::Quad);
         }
@@ -117,7 +102,6 @@ impl Hand {
     fn get_value_count_map(&self) -> HashMap<CardValue, u8> {
         let values = self
             .cards
-            .0
             .iter()
             .map(|x| x.value)
             .collect::<Vec<CardValue>>();
@@ -131,7 +115,6 @@ impl Hand {
     fn find_straight(&self, combinations_found: &mut Vec<PokerCombination>) {
         let mut vals = self
             .cards
-            .0
             .iter()
             .map(|x| x.value)
             .collect::<Vec<CardValue>>();
@@ -168,8 +151,8 @@ impl Hand {
         if combinations_found.contains(&PokerCombination::Flush)
             && combinations_found.contains(&PokerCombination::Straight)
         {
-            if self.cards.0.iter().any(|x| x.value == CardValue::Ace)
-                && self.cards.0.iter().any(|x| x.value == CardValue::Ten)
+            if self.cards.iter().any(|x| x.value == CardValue::Ace)
+                && self.cards.iter().any(|x| x.value == CardValue::Ten)
             {
                 combinations_found.push(PokerCombination::RoyalFlush);
             } else {
@@ -185,13 +168,13 @@ mod tests {
 
     fn get_quad_hand() -> Hand {
         let mut hand = Hand {
-            cards: Cards(vec![
+            cards: vec![
                 Card {
                     suit: Suit::Diamonds,
                     value: CardValue::Two,
                 };
                 4
-            ]),
+            ],
         };
         hand.put_card(Card {
             suit: Suit::Diamonds,
@@ -202,7 +185,7 @@ mod tests {
 
     fn get_fullhouse_hand() -> Hand {
         Hand {
-            cards: Cards(vec![
+            cards: vec![
                 Card {
                     suit: Suit::Diamonds,
                     value: CardValue::Two,
@@ -223,13 +206,13 @@ mod tests {
                     suit: Suit::Diamonds,
                     value: CardValue::Three,
                 },
-            ]),
+            ],
         }
     }
 
     fn get_two_pairs_hand() -> Hand {
         Hand {
-            cards: Cards(vec![
+            cards: vec![
                 Card {
                     suit: Suit::Diamonds,
                     value: CardValue::Two,
@@ -250,13 +233,13 @@ mod tests {
                     suit: Suit::Diamonds,
                     value: CardValue::Five,
                 },
-            ]),
+            ],
         }
     }
 
     fn get_straight_flush_hand() -> Hand {
         Hand {
-            cards: Cards(vec![
+            cards: vec![
                 Card {
                     suit: Suit::Diamonds,
                     value: CardValue::Six,
@@ -285,34 +268,34 @@ mod tests {
                     suit: Suit::Diamonds,
                     value: CardValue::Six,
                 },
-            ]),
+            ],
         }
     }
 
     #[test]
     fn creates_new_hand_empty() {
         let new_hand = Hand::new();
-        assert!(new_hand.cards.0.is_empty());
+        assert!(new_hand.cards.is_empty());
     }
 
     #[test]
     fn can_put_cards_into_existing_hand() {
         let mut new_hand = Hand::new();
-        assert!(new_hand.cards.0.is_empty());
+        assert!(new_hand.cards.is_empty());
         new_hand.put_card(Card::random_new());
-        assert_eq!(new_hand.len(), 1);
+        assert_eq!(new_hand.cards.len(), 1);
         new_hand.put_cards(&get_two_pairs_hand());
-        assert_eq!(new_hand.len(), 6);
+        assert_eq!(new_hand.cards.len(), 6);
     }
 
     #[test]
     fn can_clear_cards() {
         let mut new_hand = Hand::new();
-        assert!(new_hand.cards.0.is_empty());
+        assert!(new_hand.cards.is_empty());
         new_hand.put_card(Card::random_new());
-        assert_eq!(new_hand.len(), 1);
+        assert_eq!(new_hand.cards.len(), 1);
         new_hand.clear_cards();
-        assert_eq!(new_hand.len(), 0);
+        assert_eq!(new_hand.cards.len(), 0);
     }
 
     #[test]

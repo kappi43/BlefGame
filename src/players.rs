@@ -29,7 +29,7 @@ impl Player {
 }
 
 pub struct Players {
-    players: Vec<Player>
+    players: Vec<Player>,
 }
 
 impl Players {
@@ -74,6 +74,8 @@ impl Players {
     }
 
     pub fn is_limit_hit(&self, limit: u8) -> bool {
-        self.players().iter().any(|player|player.number_of_cards_to_deal == limit)
+        self.players()
+            .iter()
+            .any(|player| player.number_of_cards_to_deal == limit)
     }
 }
