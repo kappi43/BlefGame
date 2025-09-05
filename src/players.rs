@@ -33,8 +33,8 @@ pub struct Players {
 }
 
 impl Players {
-    pub fn new(no_of_players: u8) -> Self {
-        let players = vec![Player::new(Hand::new()); no_of_players as usize];
+    pub fn new(no_of_players: usize) -> Self {
+        let players = vec![Player::new(Hand::new()); no_of_players];
         let mut players = Players { players };
         println!("Dealing cards");
         players.deal_cards();
@@ -52,6 +52,10 @@ impl Players {
     }
     pub fn players(&self) -> &Vec<Player> {
         &self.players
+    }
+
+    pub fn len(&self) -> usize {
+        self.players.len()
     }
 
     pub fn players_mut(&mut self) -> &mut Vec<Player> {
@@ -77,5 +81,42 @@ impl Players {
         self.players()
             .iter()
             .any(|player| player.number_of_cards_to_deal == limit)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::players::Players;
+
+    #[test]
+    fn creates_new_players_with_given_count() {
+        let players = Players::new(3);
+        assert_eq!(players.len(), 3)
+    }
+
+    #[test]
+    fn empties_all_cards_in_all_hands() {
+        let mut players = Players::new(3);
+        assert_eq!(players.get_all_cards().len(), 3);
+        players.empty_all_cards();
+        assert_eq!(players.get_all_cards().len(), 0);
+    }
+
+    #[test]
+    fn when_one_player_reaches_card_limit_is_limit_hit_returns_true() {
+        let players = Players::new(3);
+        assert_eq!(players.is_limit_hit(1), true);
+        assert_eq!(players.is_limit_hit(2), false);
+    }
+
+    #[test]
+    fn deal_card_deals_appropriately_to_each_player() {
+        let mut players = Players::new(3);
+        players.players_mut()[0].number_of_cards_to_deal = 3;
+        players.empty_all_cards();
+        players.deal_cards();
+        assert_eq!(players.players()[0].hand.len(), 3);
+        assert_eq!(players.players()[1].hand.len(), 1);
+        assert_eq!(players.players()[2].hand.len(), 1);
     }
 }

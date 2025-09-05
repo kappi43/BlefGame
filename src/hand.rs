@@ -44,11 +44,16 @@ impl Hand {
         self.cards.clear();
     }
 
+    pub fn len(&self) -> usize {
+        self.cards.len()
+    }
+
     pub fn discover_combinations(&self) -> Vec<PokerCombination> {
         let mut combinations_found = Vec::new();
         self.find_flush(&mut combinations_found);
         self.find_quantity_figures(&mut combinations_found);
         self.find_straight(&mut combinations_found);
+        // The method below relies on methods above being called before to discover straight and flush. Probably code structure issue
         self.is_straight_or_royal_flush(&mut combinations_found);
         combinations_found
     }
