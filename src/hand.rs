@@ -44,6 +44,7 @@ impl Hand {
         self.cards.clear();
     }
 
+    #[allow(dead_code)] // Used in UT for now
     pub fn len(&self) -> usize {
         self.cards.len()
     }

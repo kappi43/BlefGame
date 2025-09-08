@@ -33,7 +33,6 @@ fn main() {
 }
 
 // To refactor and extract all the below functions to GameLogic module
-// testing actions
 fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
     println!("Beginning new round");
 

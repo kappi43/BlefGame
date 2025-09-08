@@ -54,6 +54,7 @@ impl Players {
         &self.players
     }
 
+    #[allow(dead_code)] // Used in UT for now
     pub fn len(&self) -> usize {
         self.players.len()
     }
@@ -105,8 +106,8 @@ mod tests {
     #[test]
     fn when_one_player_reaches_card_limit_is_limit_hit_returns_true() {
         let players = Players::new(3);
-        assert_eq!(players.is_limit_hit(1), true);
-        assert_eq!(players.is_limit_hit(2), false);
+        assert!(players.is_limit_hit(1));
+        assert!(!players.is_limit_hit(2));
     }
 
     #[test]
