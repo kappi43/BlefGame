@@ -433,8 +433,8 @@ mod tests {
             );
         }
         assert!(
-            &cards
-                == &[
+            cards
+                == [
                     Card::new(Suit::Spades, CardValue::Ace),
                     Card::new(Suit::Spades, CardValue::King),
                     Card::new(Suit::Spades, CardValue::Queen),
