@@ -1,4 +1,4 @@
-use crate::hand::{Card, Hand};
+use crate::hand::{Card, Deck, Hand};
 
 #[derive(Clone)]
 pub struct Player {
@@ -43,10 +43,18 @@ impl Players {
     }
 
     pub fn deal_cards(&mut self) {
+        let mut deck = Deck::new();
+        deck.shuffle();
         for player in self.players.iter_mut() {
             for _ in 0..player.number_of_cards_to_deal {
-                let card = Card::random_new();
-                player.put_card(card)
+                match deck.draw() {
+                    Ok(card) => {
+                        player.put_card(card);
+                    }
+                    Err(_) => {
+                        panic!("Critical problem with deck - not implemented handling!")
+                    }
+                }
             }
         }
     }
@@ -73,8 +81,8 @@ impl Players {
         let mut all_cards = Hand::new();
         for player in self.players() {
             all_cards.put_cards(player.hand());
-            println!("{:?}", all_cards);
         }
+        println!("All cards: {:?}", all_cards);
         all_cards
     }
 
