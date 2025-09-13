@@ -59,10 +59,7 @@ pub struct Card {
 
 impl Card {
     pub fn new(suit: Suit, value: CardValue) -> Self {
-        Card {
-            suit,
-            value,
-        }
+        Card { suit, value }
     }
 }
 
@@ -324,7 +321,7 @@ mod tests {
         }
     }
 
-    fn do_vecs_match<T: PartialEq>(a: &Vec<T>, b: &Vec<T>) -> bool {
+    fn do_vecs_match<T: PartialEq>(a: &[T], b: &[T]) -> bool {
         let matching = a.iter().zip(b.iter()).filter(|&(a, b)| a == b).count();
         matching == a.len() && matching == b.len()
     }
@@ -441,7 +438,7 @@ mod tests {
         }
         assert!(do_vecs_match(
             &cards,
-            &vec![
+            &[
                 Card::new(Suit::Spades, CardValue::Ace),
                 Card::new(Suit::Spades, CardValue::King),
                 Card::new(Suit::Spades, CardValue::Queen),
@@ -465,7 +462,7 @@ mod tests {
                 Card::new(Suit::Clubs, CardValue::Queen),
                 Card::new(Suit::Clubs, CardValue::Jack),
                 Card::new(Suit::Clubs, CardValue::Ten),
-                Card::new(Suit::Clubs, CardValue::Nine),
+                Card::new(Suit::Clubs, CardValue::Nine)
             ]
         ));
     }
