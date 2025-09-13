@@ -34,18 +34,18 @@ impl Deck {
                 cards.push(Card::new(suit, value));
             }
         }
-        Deck { cards }
+        Self { cards }
     }
 
     pub fn shuffle(&mut self) {
         self.cards.shuffle(&mut thread_rng());
     }
+
     pub fn draw(&mut self) -> Result<Card, DeckError> {
         if !self.cards.is_empty() {
-            let card = self.cards.pop().unwrap();
-            Ok(card)
+            Ok(self.cards.pop().unwrap())
         } else {
-            println!("Cannot draw from mi");
+            println!("Cannot draw from empty deck!");
             Err(DeckError::EmptyDeck)
         }
     }
