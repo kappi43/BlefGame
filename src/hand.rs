@@ -42,12 +42,10 @@ impl Deck {
     }
 
     pub fn draw(&mut self) -> Result<Card, DeckError> {
-        if !self.cards.is_empty() {
-            Ok(self.cards.pop().unwrap())
-        } else {
-            println!("Cannot draw from empty deck!");
-            Err(DeckError::EmptyDeck)
-        }
+        self.cards.pop().ok_or_else(|| {
+            println!("Cannot draw from deck!");
+            DeckError::EmptyDeck
+        })
     }
 }
 
