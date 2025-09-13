@@ -1,3 +1,5 @@
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use std::collections::{HashMap, HashSet};
 
 use crate::card_suit::Suit;
@@ -5,18 +7,57 @@ use crate::card_value::CardValue;
 use crate::poker_combination::PokerCombination;
 
 // This whole file is to refactor
-#[derive(Copy, Clone, Debug)]
+#[derive(Debug)]
+pub enum DeckError {
+    EmptyDeck,
+}
+
+#[derive(Clone, Debug)]
+pub struct Deck {
+    cards: Vec<Card>,
+}
+
+impl Deck {
+    pub fn new() -> Self {
+        let mut cards = Vec::new();
+        let suits = [Suit::Clubs, Suit::Diamonds, Suit::Hearts, Suit::Spades];
+        let values = [
+            CardValue::Nine,
+            CardValue::Ten,
+            CardValue::Jack,
+            CardValue::Queen,
+            CardValue::King,
+            CardValue::Ace,
+        ];
+        for suit in suits {
+            for value in values {
+                cards.push(Card::new(suit, value));
+            }
+        }
+        Self { cards }
+    }
+
+    pub fn shuffle(&mut self) {
+        self.cards.shuffle(&mut thread_rng());
+    }
+
+    pub fn draw(&mut self) -> Result<Card, DeckError> {
+        self.cards.pop().ok_or_else(|| {
+            println!("Cannot draw from deck!");
+            DeckError::EmptyDeck
+        })
+    }
+}
+
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Card {
     pub suit: Suit,
     pub value: CardValue,
 }
 
 impl Card {
-    pub fn random_new() -> Self {
-        Card {
-            suit: Suit::generate_random(),
-            value: CardValue::generate_random(),
-        }
+    pub fn new(suit: Suit, value: CardValue) -> Self {
+        Card { suit, value }
     }
 }
 
@@ -288,7 +329,10 @@ mod tests {
     fn can_put_cards_into_existing_hand() {
         let mut new_hand = Hand::new();
         assert!(new_hand.cards.is_empty());
-        new_hand.put_card(Card::random_new());
+        new_hand.put_card(Card::new(
+            Suit::generate_random(),
+            CardValue::generate_random(),
+        ));
         assert_eq!(new_hand.cards.len(), 1);
         new_hand.put_cards(&get_two_pairs_hand());
         assert_eq!(new_hand.cards.len(), 6);
@@ -298,7 +342,10 @@ mod tests {
     fn can_clear_cards() {
         let mut new_hand = Hand::new();
         assert!(new_hand.cards.is_empty());
-        new_hand.put_card(Card::random_new());
+        new_hand.put_card(Card::new(
+            Suit::generate_random(),
+            CardValue::generate_random(),
+        ));
         assert_eq!(new_hand.cards.len(), 1);
         new_hand.clear_cards();
         assert_eq!(new_hand.cards.len(), 0);
@@ -371,5 +418,56 @@ mod tests {
                 .discover_combinations()
                 .contains(&PokerCombination::StraightFlush)
         );
+    }
+    #[test]
+    fn test_basic_deck() {
+        let mut sut_deck = Deck::new();
+        let mut cards = Vec::new();
+        for _ in 0..24 {
+            cards.push(
+                sut_deck
+                    .draw()
+                    .expect("Draw is expected to be possible 24 times!"),
+            );
+        }
+        assert_eq!(
+            cards,
+            [
+                Card::new(Suit::Spades, CardValue::Ace),
+                Card::new(Suit::Spades, CardValue::King),
+                Card::new(Suit::Spades, CardValue::Queen),
+                Card::new(Suit::Spades, CardValue::Jack),
+                Card::new(Suit::Spades, CardValue::Ten),
+                Card::new(Suit::Spades, CardValue::Nine),
+                Card::new(Suit::Hearts, CardValue::Ace),
+                Card::new(Suit::Hearts, CardValue::King),
+                Card::new(Suit::Hearts, CardValue::Queen),
+                Card::new(Suit::Hearts, CardValue::Jack),
+                Card::new(Suit::Hearts, CardValue::Ten),
+                Card::new(Suit::Hearts, CardValue::Nine),
+                Card::new(Suit::Diamonds, CardValue::Ace),
+                Card::new(Suit::Diamonds, CardValue::King),
+                Card::new(Suit::Diamonds, CardValue::Queen),
+                Card::new(Suit::Diamonds, CardValue::Jack),
+                Card::new(Suit::Diamonds, CardValue::Ten),
+                Card::new(Suit::Diamonds, CardValue::Nine),
+                Card::new(Suit::Clubs, CardValue::Ace),
+                Card::new(Suit::Clubs, CardValue::King),
+                Card::new(Suit::Clubs, CardValue::Queen),
+                Card::new(Suit::Clubs, CardValue::Jack),
+                Card::new(Suit::Clubs, CardValue::Ten),
+                Card::new(Suit::Clubs, CardValue::Nine)
+            ]
+        );
+    }
+    #[test]
+    fn test_empty_deck_behaviour() {
+        let mut sut_deck = Deck::new();
+        for _ in 0..24 {
+            sut_deck
+                .draw()
+                .expect("Draw is expected to be possible 24 times!");
+        }
+        sut_deck.draw().expect_err("Expected Error on 25th draw");
     }
 }
