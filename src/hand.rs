@@ -60,8 +60,8 @@ pub struct Card {
 impl Card {
     pub fn new(suit: Suit, value: CardValue) -> Self {
         Card {
-            suit: suit,
-            value: value,
+            suit,
+            value,
         }
     }
 }
