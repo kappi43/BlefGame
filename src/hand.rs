@@ -430,34 +430,34 @@ mod tests {
                     .expect("Draw is expected to be possible 24 times!"),
             );
         }
-        assert!(
-            cards
-                == [
-                    Card::new(Suit::Spades, CardValue::Ace),
-                    Card::new(Suit::Spades, CardValue::King),
-                    Card::new(Suit::Spades, CardValue::Queen),
-                    Card::new(Suit::Spades, CardValue::Jack),
-                    Card::new(Suit::Spades, CardValue::Ten),
-                    Card::new(Suit::Spades, CardValue::Nine),
-                    Card::new(Suit::Hearts, CardValue::Ace),
-                    Card::new(Suit::Hearts, CardValue::King),
-                    Card::new(Suit::Hearts, CardValue::Queen),
-                    Card::new(Suit::Hearts, CardValue::Jack),
-                    Card::new(Suit::Hearts, CardValue::Ten),
-                    Card::new(Suit::Hearts, CardValue::Nine),
-                    Card::new(Suit::Diamonds, CardValue::Ace),
-                    Card::new(Suit::Diamonds, CardValue::King),
-                    Card::new(Suit::Diamonds, CardValue::Queen),
-                    Card::new(Suit::Diamonds, CardValue::Jack),
-                    Card::new(Suit::Diamonds, CardValue::Ten),
-                    Card::new(Suit::Diamonds, CardValue::Nine),
-                    Card::new(Suit::Clubs, CardValue::Ace),
-                    Card::new(Suit::Clubs, CardValue::King),
-                    Card::new(Suit::Clubs, CardValue::Queen),
-                    Card::new(Suit::Clubs, CardValue::Jack),
-                    Card::new(Suit::Clubs, CardValue::Ten),
-                    Card::new(Suit::Clubs, CardValue::Nine)
-                ]
+        assert_eq!(
+            cards,
+            [
+                Card::new(Suit::Spades, CardValue::Ace),
+                Card::new(Suit::Spades, CardValue::King),
+                Card::new(Suit::Spades, CardValue::Queen),
+                Card::new(Suit::Spades, CardValue::Jack),
+                Card::new(Suit::Spades, CardValue::Ten),
+                Card::new(Suit::Spades, CardValue::Nine),
+                Card::new(Suit::Hearts, CardValue::Ace),
+                Card::new(Suit::Hearts, CardValue::King),
+                Card::new(Suit::Hearts, CardValue::Queen),
+                Card::new(Suit::Hearts, CardValue::Jack),
+                Card::new(Suit::Hearts, CardValue::Ten),
+                Card::new(Suit::Hearts, CardValue::Nine),
+                Card::new(Suit::Diamonds, CardValue::Ace),
+                Card::new(Suit::Diamonds, CardValue::King),
+                Card::new(Suit::Diamonds, CardValue::Queen),
+                Card::new(Suit::Diamonds, CardValue::Jack),
+                Card::new(Suit::Diamonds, CardValue::Ten),
+                Card::new(Suit::Diamonds, CardValue::Nine),
+                Card::new(Suit::Clubs, CardValue::Ace),
+                Card::new(Suit::Clubs, CardValue::King),
+                Card::new(Suit::Clubs, CardValue::Queen),
+                Card::new(Suit::Clubs, CardValue::Jack),
+                Card::new(Suit::Clubs, CardValue::Ten),
+                Card::new(Suit::Clubs, CardValue::Nine)
+            ]
         );
     }
     #[test]
