@@ -1,11 +1,11 @@
 use std::io;
-
+use std::ops::Index;
 use commands::Commands;
 use config::Config;
 use poker_combination::PokerCombination;
 
 use crate::hand::Hand;
-use crate::players::Players;
+use crate::players::{Player, Players};
 
 mod card_suit;
 mod card_value;
@@ -35,51 +35,61 @@ fn main() {
 // To refactor and extract all the below functions to GameLogic module
 fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
     println!("Beginning new round");
-
-    let all_cards = players.get_all_cards();
-    for (index, player) in players.players_mut().iter_mut().enumerate() {
-        println!("Current bet: {:?}", current_bet);
-        println!("Player {index}");
-        player.print_hand();
-        // Move the below command getting loop into a method in commands? try_get_next_command_until_success?
-        let mut command = commands::get_next_command();
-        while command == Commands::Unknown {
-            command = commands::get_next_command();
-        }
-        match command {
-            Commands::Bet(value) => {
-                handle_new_bet(value, current_bet);
+    println!("All cards: {:?}", players.get_all_cards());
+    for i in 0..players.len(){
+            println!("Current bet: {:?}", current_bet);
+            println!("Player {i}");
+            players.players()[i].print_hand();
+            // Move the below command getting loop into a method in commands? try_get_next_command_until_success?
+            let mut command = commands::get_next_command();
+            while command == Commands::Unknown {
+                command = commands::get_next_command();
             }
-            Commands::Call => {
-                let result = check_round_result(current_bet, &all_cards); // Can return Result<RoundResult> to function above and handle round end there. This would save
-                //MAYBE players could be linked list. This would clean up this bit below A LOT. We don't care that much about performance, we probably will have at most close to 10 elements in the data structure.
-                if result {
-                    player.increase_number_of_cards_to_deal();
-                } else if index == 0 {
-                    players
-                        .players_mut()
-                        .last_mut()
-                        .unwrap()
-                        .increase_number_of_cards_to_deal();
-                } else {
-                    players
-                        .players_mut()
-                        .get_mut(index - 1)
-                        .unwrap()
-                        .increase_number_of_cards_to_deal()
+            match command {
+                Commands::Bet(value) => {
+                    handle_new_bet(value, current_bet);
                 }
-                players.empty_all_cards();
-                players.deal_cards();
-                *current_bet = PokerCombination::None;
-                return;
+                Commands::Call => {
+                    handle_call(players, current_bet,i);
+                    return;
+                }
+                Commands::Unknown => {}
             }
-            Commands::Unknown => {}
-        }
-        utils::clear_screen();
+            utils::clear_screen();
     }
 }
 
-fn check_round_result(current_bet: &PokerCombination, all_cards: &Hand) -> bool {
+fn handle_call(players: &mut Players, current_bet: &mut PokerCombination, index: usize) {
+    let result = did_call_succeed(current_bet, &players.get_all_cards());
+    handle_round_result(players, index, result);
+    reset_game_state(players, current_bet);
+}
+
+fn handle_round_result(players: &mut Players, index: usize, result: bool) {
+    if result {
+        players.players_mut()[index].increase_number_of_cards_to_deal();
+    } else {
+        increase_previous_players_number_of_cards_to_deal(players, index);
+    }
+}
+
+fn increase_previous_players_number_of_cards_to_deal(players: &mut Players, index: usize) {
+    let len = players.len();
+    let previous_index = (index + len - 1) % len;
+    players
+        .players_mut()
+        .get_mut(previous_index)
+        .unwrap()
+        .increase_number_of_cards_to_deal();
+}
+
+fn reset_game_state(players: &mut Players, current_bet: &mut PokerCombination) {
+    players.empty_all_cards();
+    players.deal_cards();
+    *current_bet = PokerCombination::None;
+}
+
+fn did_call_succeed(current_bet: &PokerCombination, all_cards: &Hand) -> bool {
     all_cards.discover_combinations().contains(current_bet)
 }
 

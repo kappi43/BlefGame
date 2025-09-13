@@ -82,7 +82,6 @@ impl Players {
         for player in self.players() {
             all_cards.put_cards(player.hand());
         }
-        println!("All cards: {:?}", all_cards);
         all_cards
     }
 
