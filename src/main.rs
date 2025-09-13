@@ -2,7 +2,6 @@ use commands::Commands;
 use config::Config;
 use poker_combination::PokerCombination;
 use std::io;
-use std::ops::Index;
 
 use crate::hand::Hand;
 use crate::players::Players;
