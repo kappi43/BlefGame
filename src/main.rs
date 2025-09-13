@@ -1,11 +1,11 @@
-use std::io;
-use std::ops::Index;
 use commands::Commands;
 use config::Config;
 use poker_combination::PokerCombination;
+use std::io;
+use std::ops::Index;
 
 use crate::hand::Hand;
-use crate::players::{Player, Players};
+use crate::players::Players;
 
 mod card_suit;
 mod card_value;
@@ -36,26 +36,26 @@ fn main() {
 fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
     println!("Beginning new round");
     println!("All cards: {:?}", players.get_all_cards());
-    for i in 0..players.len(){
-            println!("Current bet: {:?}", current_bet);
-            println!("Player {i}");
-            players.players()[i].print_hand();
-            // Move the below command getting loop into a method in commands? try_get_next_command_until_success?
-            let mut command = commands::get_next_command();
-            while command == Commands::Unknown {
-                command = commands::get_next_command();
+    for i in 0..players.len() {
+        println!("Current bet: {:?}", current_bet);
+        println!("Player {i}");
+        players.players()[i].print_hand();
+        // Move the below command getting loop into a method in commands? try_get_next_command_until_success?
+        let mut command = commands::get_next_command();
+        while command == Commands::Unknown {
+            command = commands::get_next_command();
+        }
+        match command {
+            Commands::Bet(value) => {
+                handle_new_bet(value, current_bet);
             }
-            match command {
-                Commands::Bet(value) => {
-                    handle_new_bet(value, current_bet);
-                }
-                Commands::Call => {
-                    handle_call(players, current_bet,i);
-                    return;
-                }
-                Commands::Unknown => {}
+            Commands::Call => {
+                handle_call(players, current_bet, i);
+                return;
             }
-            utils::clear_screen();
+            Commands::Unknown => {}
+        }
+        utils::clear_screen();
     }
 }
 
