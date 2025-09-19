@@ -1,6 +1,6 @@
 use std::io;
 
-use commands::Commands;
+use command::Command;
 use config::Config;
 use poker_combination::PokerCombination;
 
@@ -9,7 +9,7 @@ use crate::players::Players;
 
 mod card_suit;
 mod card_value;
-mod commands;
+mod command;
 mod config;
 mod hand;
 mod players;
@@ -42,15 +42,15 @@ fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
         println!("Player {index}");
         player.print_hand();
         // Move the below command getting loop into a method in commands? try_get_next_command_until_success?
-        let mut command = commands::get_next_command();
-        while command == Commands::Unknown {
-            command = commands::get_next_command();
+        let mut command = command::get_next_command();
+        while command.is_err() {
+            command = command::get_next_command();
         }
-        match command {
-            Commands::Bet(value) => {
+        match command.unwrap() {
+            Command::Bet(value) => {
                 handle_new_bet(value, current_bet);
             }
-            Commands::Call => {
+            Command::Call => {
                 let result = check_round_result(current_bet, &all_cards); // Can return Result<RoundResult> to function above and handle round end there. This would save
                 //MAYBE players could be linked list. This would clean up this bit below A LOT. We don't care that much about performance, we probably will have at most close to 10 elements in the data structure.
                 if result {
@@ -73,7 +73,6 @@ fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
                 *current_bet = PokerCombination::None;
                 return;
             }
-            Commands::Unknown => {}
         }
         utils::clear_screen();
     }
