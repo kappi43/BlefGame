@@ -1,4 +1,5 @@
 use crate::hand::{Card, Deck, Hand};
+use crate::poker_combination::PokerCombination;
 
 #[derive(Clone)]
 pub struct Player {
@@ -67,7 +68,8 @@ impl Players {
         self.players.len()
     }
 
-    pub fn players_mut(&mut self) -> &mut Vec<Player> {
+    #[allow(dead_code)] // used in UT for now
+    fn players_mut(&mut self) -> &mut Vec<Player> {
         &mut self.players
     }
 
@@ -89,6 +91,26 @@ impl Players {
         self.players()
             .iter()
             .any(|player| player.number_of_cards_to_deal == limit)
+    }
+
+    pub fn increase_cards_to_deal(
+        &mut self,
+        current_bet: &PokerCombination,
+        current_index: usize,
+        previous_index: usize,
+    ) {
+        if self.is_other_player_lying(current_bet) {
+            self.players[previous_index].increase_number_of_cards_to_deal();
+        } else {
+            self.players[current_index].increase_number_of_cards_to_deal();
+        }
+    }
+
+    fn is_other_player_lying(&self, current_bet: &PokerCombination) -> bool {
+        !self
+            .get_all_cards()
+            .discover_combinations()
+            .contains(current_bet)
     }
 }
 
