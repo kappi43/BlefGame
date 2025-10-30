@@ -142,6 +142,6 @@ mod tests {
     fn put_card_works() {
         let mut players = Players::new(1);
         players.get_mut()[0].put_card(Card::new(Suit::Clubs, CardValue::Ace));
-        assert_eq!(players.get_all_cards().len(), 3);
+        assert_eq!(players.get_all_cards().len(), 2); // 1 on creation and another one on put_card call
     }
 }
