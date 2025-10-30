@@ -37,7 +37,7 @@ fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
     println!("Beginning new round");
 
     let all_cards = players.get_all_cards();
-    for (index, player) in players.players_mut().iter_mut().enumerate() {
+    for (index, player) in players.get_mut().iter_mut().enumerate() {
         println!("Current bet: {:?}", current_bet);
         println!("Player {index}");
         player.print_hand();
@@ -57,13 +57,13 @@ fn play_round(players: &mut Players, current_bet: &mut PokerCombination) {
                     player.increase_number_of_cards_to_deal();
                 } else if index == 0 {
                     players
-                        .players_mut()
+                        .get_mut()
                         .last_mut()
                         .unwrap()
                         .increase_number_of_cards_to_deal();
                 } else {
                     players
-                        .players_mut()
+                        .get_mut()
                         .get_mut(index - 1)
                         .unwrap()
                         .increase_number_of_cards_to_deal()
